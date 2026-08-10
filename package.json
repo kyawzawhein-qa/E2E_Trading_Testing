@@ -1,0 +1,32 @@
+﻿{
+  "name": "e2e-trading-test-suite",
+  "version": "1.0.0",
+  "description": "Production-ready Playwright E2E trading test suite with TypeScript and Page Object Model",
+  "private": true,
+  "scripts": {
+    "test": "npx playwright test",
+    "test:smoke": "npx playwright test tests/smoke",
+    "test:e2e": "npx playwright test tests/e2e",
+    "test:regression": "npx playwright test tests/regression",
+    "test:api": "npx playwright test api",
+    "test:headed": "npx playwright test --headed",
+    "test:ui": "npx playwright test --ui",
+    "test:debug": "npx playwright test --debug",
+    "test:qa": "cross-env TEST_ENV=qa npx playwright test",
+    "test:staging": "cross-env TEST_ENV=staging npx playwright test",
+    "test:prod": "cross-env TEST_ENV=prod npx playwright test",
+    "report": "npx playwright show-report",
+    "codegen": "npx playwright codegen",
+    "install:browsers": "npx playwright install --with-deps"
+  },
+  "keywords": ["playwright", "typescript", "pom", "e2e", "trading"],
+  "author": "QA Automation",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "@types/node": "^22.17.0",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.6.1",
+    "typescript": "^5.9.2"
+  }
+}
