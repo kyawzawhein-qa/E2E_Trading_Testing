@@ -93,4 +93,4 @@ The [Playwright workflow](.github/workflows/playwright.yml) runs on push and pul
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).
