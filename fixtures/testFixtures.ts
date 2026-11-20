@@ -59,8 +59,7 @@ export const test = base.extend<TradingFixtures>({
     await use(new WatchlistComponent(page));
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Playwright requires destructuring
-  apiClient: async ({}, use) => {
+  apiClient: async ({ page: _page }, use) => {
     const client = await createApiClient();
     await use(client);
     await client.dispose();
