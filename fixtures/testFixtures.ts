@@ -19,9 +19,18 @@ type TradingFixtures = {
   watchlist: WatchlistComponent;
   apiClient: ApiClient;
   authenticatedPage: DashboardPage;
+  demoReset: void;
 };
 
 export const test = base.extend<TradingFixtures>({
+  demoReset: [
+    async ({ request }, use) => {
+      await request.post('/v1/test/reset');
+      await use();
+    },
+    { auto: true },
+  ],
+
   loginPage: async ({ page }, use) => {
     await use(new LoginPage(page));
   },
@@ -50,13 +59,14 @@ export const test = base.extend<TradingFixtures>({
     await use(new WatchlistComponent(page));
   },
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Playwright requires destructuring
   apiClient: async ({}, use) => {
     const client = await createApiClient();
     await use(client);
     await client.dispose();
   },
 
-  authenticatedPage: async ({ page, loginPage, dashboardPage }, use) => {
+  authenticatedPage: async ({ loginPage, dashboardPage }, use) => {
     await loginPage.open();
     await loginPage.login(env.username, env.password);
     await dashboardPage.assertLoaded();

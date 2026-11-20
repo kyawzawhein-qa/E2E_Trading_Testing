@@ -1,29 +1,38 @@
-# E2E Trading Testing
+# E2E Trading Test Suite (Portfolio)
 
-Playwright + TypeScript e2e for a stock order flow.
+[![Playwright Trading E2E](https://github.com/kyawzawhein-qa/E2E_Trading_Testing/actions/workflows/playwright.yml/badge.svg)](https://github.com/kyawzawhein-qa/E2E_Trading_Testing/actions/workflows/playwright.yml)
 
-A sample QA automation portfolio project: end-to-end and API tests for a trading web application, structured with the Page Object Model (POM).
+Playwright + TypeScript end-to-end and API automation for a **local mock trading web app** included in this repository. The mock target demonstrates login, dashboard, trade ticket, orders, positions, REST checks, accessibility scanning, and a **concurrency scenario** (simultaneous cancel vs fill). It is a portfolio sample only — not wired to any real broker or employer codebase.
 
-## What it covers
+## What this demonstrates
 
-| Suite | Location | Focus |
-|-------|----------|-------|
-| Smoke | `tests/smoke/` | Login via fixtures; dashboard load with pre-authenticated `storageState` |
-| E2E | `tests/e2e/` | Buy-order flow (SPCX market buy) with order and position validation |
-| Regression | `tests/regression/` | Account summary, watchlist, and positions table |
-| API | `api/` | Account summary, positions, login, and order lifecycle HTTP specs |
+| Area | Location | Notes |
+|------|----------|-------|
+| Smoke | `tests/smoke/`, `features/login.feature` | Login + dashboard; one Gherkin scenario via playwright-bdd |
+| E2E | `tests/e2e/` | Market buy through UI, order + position validation |
+| Regression | `tests/regression/` | Account/watchlist/positions, data-driven watchlist, axe a11y, cancel/fill race |
+| API | `api/` | Playwright `request` client — account, positions, auth, order lifecycle |
+| Mock target | `mock-app/` | Express UI + in-memory order engine (deterministic CI) |
 
-Page objects live under `pages/`: Login, Dashboard, TradeTicket, Orders, Positions, Watchlist, and AccountSummary (plus `BasePage`).
+**Tags:** `@smoke`, `@regression`, `@api`, `@bdd` (see npm scripts below).
+
+**Concurrency demo (mock):** `tests/regression/order-cancel-fill-race.spec.ts` places a pending order, fires cancel and fill concurrently against `/v1/test/orders/:id/race-cancel-fill`, and asserts exactly one terminal outcome — never both shares and a refund.
 
 ## Stack
 
-- [Playwright](https://playwright.dev/) — browser and API testing
-- **TypeScript** — typed tests and page objects
-- **Page Object Model** — reusable page/component classes and shared fixtures
+- Playwright (TypeScript) — UI + API
+- Page Object Model + typed fixtures (`fixtures/testFixtures.ts`)
+- Env-based config (`utils/env.ts`, `.env.example`)
+- `@axe-core/playwright` — accessibility checks
+- playwright-bdd — optional thin Gherkin layer (1 feature)
+- GitHub Actions — lint, typecheck, tests, HTML report + traces on failure
 
-## Setup
+## Prerequisites
 
-**Requirements:** Node.js 20+ and npm.
+- Node.js 20+
+- npm
+
+## Quick start
 
 ```bash
 git clone https://github.com/kyawzawhein-qa/E2E_Trading_Testing.git
@@ -31,65 +40,56 @@ cd E2E_Trading_Testing
 npm install
 npm run install:browsers
 cp .env.example .env
+npm test
 ```
 
-Edit `.env` with your test credentials and target URLs. Do not commit `.env` or real secrets.
+Playwright starts the mock server (`mock-app/server.ts`) automatically via `webServer` in `playwright.config.ts`. Default URLs point at `http://127.0.0.1:4173`.
 
-- `TEST_USERNAME` / `TEST_PASSWORD` — login credentials (required for authenticated runs)
-- `BASE_URL` / `API_BASE_URL` — override defaults from `config/urls.ts`
-- `TEST_ENV` — `qa`, `staging`, or `prod` (default: `qa`)
+Demo credentials (mock only):
 
-`global-setup.ts` logs in once and saves session state to `.auth/user.json` (`STORAGE_STATE_PATH`). Browser projects reuse that `storageState`; the API project runs without it.
+- `TEST_USERNAME=qa.trader@example.com`
+- `TEST_PASSWORD=QaTradePass123!`
 
-## Running tests
+## Scripts
 
-```bash
-npm test                  # full suite (tests/ + api/)
-npm run test:smoke        # tests/smoke
-npm run test:e2e          # tests/e2e
-npm run test:regression   # tests/regression
-npm run test:api          # api/
+| Script | Purpose |
+|--------|---------|
+| `npm test` | Full suite (bddgen + chromium + api) |
+| `npm run test:smoke` | `@smoke` |
+| `npm run test:regression` | `@regression` |
+| `npm run test:api` | API project only |
+| `npm run test:e2e` | `tests/e2e` |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run report` | Open last HTML report |
 
-npm run test:qa           # TEST_ENV=qa
-npm run test:staging      # TEST_ENV=staging
-npm run test:prod         # TEST_ENV=prod
-
-npm run test:headed       # visible browser
-npm run test:ui           # Playwright UI mode
-npm run test:debug        # debug mode
-npm run report            # open HTML report
-```
-
-## Project layout
+## Project structure
 
 ```
-├── api/                    # API test specs
-├── config/
-│   ├── urls.ts             # env-aware URL map (qa / staging / prod)
-│   └── credentials.ts      # placeholder credentials per environment
-├── fixtures/               # Playwright fixtures (page objects, api client)
-├── helpers/                # selectors, waits, browser utilities
-├── pages/                  # Page Object Model classes
+├── api/                      # API specs (@api)
+├── config/                   # URL + credential maps
+├── features/                 # Gherkin features
+├── fixtures/                 # Typed Playwright fixtures
+├── helpers/                  # Selectors, waits
+├── mock-app/                 # Demo trading UI + order engine
+├── pages/                    # Page Object Model
+├── steps/                    # BDD step definitions
 ├── tests/
 │   ├── smoke/
 │   ├── e2e/
 │   └── regression/
-├── utils/                  # env loader, API client, test data, logger
-├── global-setup.ts         # login + storageState bootstrap
-├── playwright.config.ts
-└── .github/workflows/
-    └── playwright.yml      # CI (chromium + api on push/PR)
+├── global-setup.ts           # Login + storageState for browser tests
+└── playwright.config.ts
 ```
-
-## Target URLs
-
-`config/urls.ts` defines **example placeholder** hosts for each environment (e.g. `qa-trading.example.com`, `staging-trading.example.com`). They illustrate a sample trading app structure — login, dashboard, trade ticket, orders, positions, and account summary paths.
-
-Point `BASE_URL` and `API_BASE_URL` in `.env` at your own test environment when running locally or in CI (GitHub Actions reads credentials from repository secrets).
 
 ## CI
 
-The [Playwright workflow](.github/workflows/playwright.yml) runs on push and pull requests to `main` / `master` / `develop`, executing **chromium** and **api** projects. Reports and JUnit output are uploaded as artifacts.
+[`.github/workflows/playwright.yml`](.github/workflows/playwright.yml) runs `npm run bddgen`, `typecheck`, `lint`, and the full Playwright suite against the local mock (no external secrets). Artifacts: HTML report always; Playwright traces when a job fails.
+
+## Reports
+
+- HTML: `playwright-report/` (also CI artifact)
+- JUnit: `test-results/junit-report.xml`
 
 ## License
 

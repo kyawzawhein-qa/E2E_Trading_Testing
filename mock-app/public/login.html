@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Demo Trading — Login</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="panel" data-testid="login-page">
+      <h1>Demo Trading Login</h1>
+      <p class="hint">Portfolio mock target — not a real broker.</p>
+      <form id="login-form" action="/dashboard" method="get">
+        <label>
+          Username
+          <input data-testid="login-username" id="username" name="username" type="text" autocomplete="username" />
+        </label>
+        <label>
+          Password
+          <input data-testid="login-password" id="password" name="password" type="password" autocomplete="current-password" />
+        </label>
+        <p data-testid="login-error" class="login-error hidden" role="alert">Invalid credentials</p>
+        <button data-testid="login-submit" id="login-button" type="submit">Sign in</button>
+      </form>
+    </main>
+    <script src="/app.js"></script>
+    <script>
+      document.getElementById('login-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const ok = await window.demoApp.login(username, password);
+        if (ok) {
+          window.location.href = '/dashboard';
+        } else {
+          document.querySelector('[data-testid="login-error"]').classList.remove('hidden');
+        }
+      });
+    </script>
+  </body>
+</html>

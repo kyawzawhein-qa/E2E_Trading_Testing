@@ -12,37 +12,27 @@ on:
       - master
       - develop
   workflow_dispatch:
-    inputs:
-      environment:
-        description: Target test environment
-        required: true
-        default: qa
-        type: choice
-        options:
-          - qa
-          - staging
-          - prod
+
+concurrency:
+  group: playwright-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  playwright-tests:
+  quality-and-e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-
-    strategy:
-      fail-fast: false
-      matrix:
-        project: [chromium, api]
+    timeout-minutes: 45
 
     env:
       CI: true
-      TEST_ENV: ${{ github.event.inputs.environment || 'qa' }}
-      BASE_URL: ${{ secrets.BASE_URL }}
-      API_BASE_URL: ${{ secrets.API_BASE_URL }}
-      TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
-      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      TEST_ENV: qa
+      BASE_URL: http://127.0.0.1:4173
+      API_BASE_URL: http://127.0.0.1:4173
+      TEST_USERNAME: qa.trader@example.com
+      TEST_PASSWORD: QaTradePass123!
       HEADLESS: true
-      RETRIES: 2
-      WORKERS: 2
+      RETRIES: 1
+      WORKERS: 1
+      MOCK_PORT: 4173
 
     steps:
       - name: Checkout repository
@@ -57,24 +47,42 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate BDD tests
+        run: npm run bddgen
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps chromium
 
       - name: Run Playwright tests
-        run: npx playwright test --project=${{ matrix.project }}
+        run: npx playwright test
 
       - name: Upload Playwright HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-${{ matrix.project }}-${{ env.TEST_ENV }}
+          name: playwright-report
           path: playwright-report
+          retention-days: 14
+
+      - name: Upload traces on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-results/**/*.zip
           retention-days: 14
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ matrix.project }}-${{ env.TEST_ENV }}
+          name: test-results
           path: test-results
+          if-no-files-found: ignore
           retention-days: 14

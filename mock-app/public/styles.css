@@ -1,0 +1,64 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #0f172a;
+  background: #f8fafc;
+}
+
+body {
+  margin: 0;
+  padding: 1.5rem;
+}
+
+.panel {
+  max-width: 420px;
+  margin: 3rem auto;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+label {
+  display: block;
+  margin: 0.75rem 0;
+}
+
+input,
+select,
+button {
+  font: inherit;
+}
+
+.main-nav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.hidden {
+  display: none;
+}
+
+.login-error {
+  color: #b91c1c;
+}
+
+.dashboard table,
+.positions-panel table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dashboard th,
+.dashboard td,
+.positions-panel th,
+.positions-panel td {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.side-buttons button.active {
+  background: #0ea5e9;
+  color: white;
+}

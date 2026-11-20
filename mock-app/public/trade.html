@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Demo Trading — Trade Ticket</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div data-testid="dashboard" class="dashboard">
+      <nav data-testid="nav-menu" class="main-nav" role="navigation">
+        <a data-testid="nav-trade" href="/trade">Trade</a>
+        <a data-testid="nav-orders" href="/orders">Orders</a>
+        <a data-testid="nav-positions" href="/positions">Positions</a>
+      </nav>
+      <h1>Trade Ticket</h1>
+      <label>
+        Symbol search
+        <input data-testid="symbol-search" id="symbol-search" name="symbol" type="text" placeholder="e.g. SPCX" />
+      </label>
+      <div id="search-results"></div>
+      <button data-testid="open-trade-ticket" id="open-trade-ticket" type="button">Trade</button>
+      <div id="ticket" class="hidden">
+        <div class="side-buttons">
+          <button data-testid="order-side-buy" id="buy-button" type="button">Buy</button>
+          <button data-testid="order-side-sell" id="sell-button" type="button">Sell</button>
+        </div>
+        <label>
+          Quantity
+          <input data-testid="order-quantity" id="quantity" name="quantity" type="number" value="100" />
+        </label>
+        <label>
+          Order type
+          <select data-testid="order-type" id="order-type" name="orderType">
+            <option>Market</option>
+            <option>Limit</option>
+            <option>Stop</option>
+            <option>Stop Limit</option>
+          </select>
+        </label>
+        <button data-testid="submit-order" id="submit-order" type="button">Submit</button>
+        <p data-testid="order-confirmation" class="order-confirmation hidden" role="status"></p>
+      </div>
+    </div>
+    <script src="/app.js"></script>
+    <script>
+      window.demoApp.requireSession();
+      const symbols = ['SPCX', 'AAPL', 'SPY', 'TSLA'];
+      const searchInput = document.getElementById('symbol-search');
+      const results = document.getElementById('search-results');
+      let selectedSymbol = 'SPCX';
+
+      function renderResults(query) {
+        results.innerHTML = '';
+        symbols
+          .filter((s) => s.includes(query.toUpperCase()))
+          .forEach((symbol) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.dataset.testid = `search-result-${symbol}`;
+            btn.dataset.symbol = symbol;
+            btn.textContent = symbol;
+            btn.addEventListener('click', () => {
+              selectedSymbol = symbol;
+              searchInput.value = symbol;
+            });
+            results.appendChild(btn);
+          });
+      }
+
+      searchInput.addEventListener('input', () => renderResults(searchInput.value.trim()));
+      renderResults('SPCX');
+
+      document.getElementById('open-trade-ticket').addEventListener('click', () => {
+        document.getElementById('ticket').classList.remove('hidden');
+      });
+
+      document.getElementById('submit-order').addEventListener('click', async () => {
+        const quantity = Number(document.getElementById('quantity').value);
+        const orderType = document.getElementById('order-type').value;
+        const side = document.getElementById('buy-button').classList.contains('active') ? 'buy' : 'sell';
+        await window.demoApp.api('POST', '/v1/orders', {
+          symbol: selectedSymbol,
+          side,
+          quantity,
+          orderType,
+        });
+        const fill = await window.demoApp.api('PUT', `/v1/orders/${window.demoApp.lastOrderId}`, {
+          status: 'filled',
+        });
+        const confirmation = document.querySelector('[data-testid="order-confirmation"]');
+        confirmation.textContent = fill.ok ? `Order submitted for ${selectedSymbol}` : 'Order failed';
+        confirmation.classList.remove('hidden');
+      });
+
+      document.getElementById('buy-button').addEventListener('click', () => {
+        document.getElementById('buy-button').classList.add('active');
+        document.getElementById('sell-button').classList.remove('active');
+      });
+      document.getElementById('buy-button').classList.add('active');
+    </script>
+  </body>
+</html>

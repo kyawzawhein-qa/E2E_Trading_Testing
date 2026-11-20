@@ -13,8 +13,8 @@ export interface EnvironmentUrls {
 
 const urlMap: Record<EnvironmentName, EnvironmentUrls> = {
   qa: {
-    baseUrl: 'https://qa-trading.example.com',
-    apiBaseUrl: 'https://qa-api.trading.example.com',
+    baseUrl: 'http://127.0.0.1:4173',
+    apiBaseUrl: 'http://127.0.0.1:4173',
     loginPath: '/login',
     dashboardPath: '/dashboard',
     tradeTicketPath: '/trade',

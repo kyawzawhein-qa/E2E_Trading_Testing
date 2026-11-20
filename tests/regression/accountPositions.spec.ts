@@ -1,7 +1,7 @@
 import { test, expect } from '../../fixtures/testFixtures';
 import { accountExpectations } from '../../utils/testData';
 
-test.describe('Regression | Account & Positions', () => {
+test.describe('Regression | Account & Positions', { tag: ['@regression'] }, () => {
   test('should validate account summary, watchlist, and positions table', async ({
     authenticatedPage,
     accountSummary,
