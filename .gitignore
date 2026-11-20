@@ -1,6 +1,7 @@
 node_modules/
 dist/
 playwright-report/
+.features-gen/
 test-results/
 blob-report/
 .auth/

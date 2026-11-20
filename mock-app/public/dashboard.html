@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Demo Trading — Dashboard</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div data-testid="dashboard" id="dashboard" class="dashboard">
+      <nav data-testid="nav-menu" class="main-nav" role="navigation">
+        <a data-testid="nav-trade" href="/trade">Trade</a>
+        <a data-testid="nav-orders" href="/orders">Orders</a>
+        <a data-testid="nav-positions" href="/positions">Positions</a>
+      </nav>
+      <header><h1>Trading Dashboard</h1></header>
+      <section data-testid="account-summary" id="account-summary" class="account-summary">
+        <div>
+          <span>Account Value</span>
+          <strong data-testid="account-value" data-field="accountValue">—</strong>
+        </div>
+        <div>
+          <span>Buying Power</span>
+          <strong data-testid="buying-power" data-field="buyingPower">—</strong>
+        </div>
+        <div>
+          <span>P/L Day</span>
+          <strong data-testid="pl-day" data-field="plDay">—</strong>
+        </div>
+      </section>
+      <section data-testid="watchlist" id="watchlist" class="watchlist">
+        <h2>Watchlist</h2>
+        <table>
+          <tbody id="watchlist-body"></tbody>
+        </table>
+      </section>
+    </div>
+    <script src="/app.js"></script>
+    <script>
+      window.demoApp.requireSession();
+      window.demoApp.loadDashboard();
+    </script>
+  </body>
+</html>

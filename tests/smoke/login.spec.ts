@@ -1,11 +1,8 @@
 import { test, expect } from '../../fixtures/testFixtures';
 import { env } from '../../utils/env';
 
-test.describe('Smoke | Login', () => {
-  test('should login using fixtures and load dashboard', async ({
-    loginPage,
-    dashboardPage,
-  }) => {
+test.describe('Smoke | Login', { tag: ['@smoke'] }, () => {
+  test('should login using fixtures and load dashboard', async ({ loginPage, dashboardPage }) => {
     await loginPage.open();
     await loginPage.login(env.username, env.password);
     await dashboardPage.assertLoaded();

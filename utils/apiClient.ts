@@ -23,6 +23,7 @@ export class ApiClient {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        'x-demo-auth': 'demo-session',
         ...(options.headers || {}),
       },
       timeout: options.timeout || env.timeout,

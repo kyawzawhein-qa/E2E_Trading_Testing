@@ -32,7 +32,9 @@ export class OrdersPage extends BasePage {
 
   async assertOrderPresent(symbol: string): Promise<void> {
     const orderRow = this.findOrderBySymbol(symbol);
-    await expect(orderRow).toBeVisible({ timeout: env.timeout });
+    await expect
+      .poll(async () => orderRow.isVisible().catch(() => false), { timeout: env.timeout })
+      .toBe(true);
     logger.info(`Order for ${symbol} found`);
   }
 

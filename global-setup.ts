@@ -5,6 +5,18 @@ import { env } from './utils/env';
 import { logger } from './utils/logger';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { mockBaseUrl } from './mock-app/runtimeEnv';
+
+async function resetDemoState(): Promise<void> {
+  try {
+    const response = await fetch(`${mockBaseUrl()}/v1/test/reset`, { method: 'POST' });
+    if (!response.ok) {
+      logger.warn(`Demo reset returned ${response.status}`);
+    }
+  } catch (error) {
+    logger.warn('Demo reset skipped (mock server may still be starting)', error);
+  }
+}
 
 async function globalSetup(config: FullConfig): Promise<void> {
   const storageStatePath = path.resolve(process.cwd(), env.storageStatePath);
@@ -16,6 +28,8 @@ async function globalSetup(config: FullConfig): Promise<void> {
 
   logger.info(`Running global setup for environment: ${env.testEnv}`);
   logger.info(`Base URL: ${env.baseUrl}`);
+
+  await resetDemoState();
 
   const browser = await chromium.launch({ headless: env.headless });
   const context = await browser.newContext({

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Demo Trading — Positions</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div data-testid="positions" id="positions" class="positions-panel">
+      <nav data-testid="nav-menu" class="main-nav" role="navigation">
+        <a data-testid="nav-trade" href="/trade">Trade</a>
+        <a data-testid="nav-orders" href="/orders">Orders</a>
+        <a data-testid="nav-positions" href="/positions">Positions</a>
+      </nav>
+      <h1>Positions</h1>
+      <table>
+        <thead>
+          <tr><th>Symbol</th><th>Qty</th><th>P/L</th><th>Cost</th><th>Net Liq</th></tr>
+        </thead>
+        <tbody id="positions-body"></tbody>
+      </table>
+    </div>
+    <script src="/app.js"></script>
+    <script>
+      window.demoApp.requireSession();
+      window.demoApp.loadPositions();
+    </script>
+  </body>
+</html>
